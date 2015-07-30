@@ -4,6 +4,15 @@ mkdir /var/log/cluster/corosync.log
 
                  # To view cluster quorum status
 
+#service corosync start
+
+To view members in cluster
+#corosync-cmapctl | grep -E "member|ip"  OR better use below
+root@node3:/etc/corosync# corosync-cmapctl  | grep -E "member.*ip"      # .* for and
+runtime.totem.pg.mrp.srp.members.3232277258.ip (str) = r(0) ip(192.168.163.10) 
+runtime.totem.pg.mrp.srp.members.3232277268.ip (str) = r(0) ip(192.168.163.20) 
+runtime.totem.pg.mrp.srp.members.3232277278.ip (str) = r(0) ip(192.168.163.30)
+
 ]# corosync-quorumtool 
 Output
 Quorum information
