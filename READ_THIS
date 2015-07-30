@@ -1,6 +1,8 @@
 #system used ubuntu 14.04 x86 , corosync Ver 2.3.3 , pacemaker Ver 1.1 
-#create log file location
-                 # view cluster quorum status
+#create log file directory and  location mention in /etc/corosync/corosync.conf
+mkdir /var/log/cluster/corosync.log
+
+                 # To view cluster quorum status
 
 ]# corosync-quorumtool 
 Output
