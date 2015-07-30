@@ -1,0 +1,29 @@
+#system used ubuntu 14.04 x86 , corosync Ver 2.3.3 , pacemaker Ver 1.1 
+#create log file location
+                 # view cluster quorum status
+
+]# corosync-quorumtool 
+Output
+Quorum information
+------------------
+Date:             Thu Jul 30 13:58:41 2015
+Quorum provider:  corosync_votequorum
+Nodes:            3
+Node ID:          3232277268
+Ring ID:          44
+Quorate:          Yes
+
+Votequorum information
+----------------------
+Expected votes:   3
+Highest expected: 3
+Total votes:      3
+Quorum:           2  
+Flags:            Quorate 
+
+Membership information
+----------------------
+    Nodeid      Votes Name
+3232277258          1 node1.demo.com
+3232277268          1 node2.demo.com (local)
+3232277278          1 node3.demo.com
