@@ -1,0 +1,58 @@
+move /boot on zfs on root to ext4
+# modprobe zfs
+# zpool import -a -N -R /mnt
+Mount the root pool into /mnt
+
+# zfs mount LP_Pool/ROOT/lp_root
+mount --rbind /proc /mnt/proc
+mount --rbind /dev /mnt/dev
+mount --rbind /sys /mnt/sys
+
+chroot /mnt /bin/bash --login
+export ZPOOL_VDEV_NAME_PATH=YES
+grub-probe /
+
+sgdisk -p /dev/sdx
+#creating
+sgdisk -n 1:2048:4095 -c 1:"BIOS Boot Partition" -t 1:ef02 /dev/sdx
+
+#below command will create new partition number "2" of size 3219MB  
+sgdisk -n 2:4096:6291456 -c 2:"Linux /boot" -t 2:8300 /dev/sdx
+
+mv /boot /newboot
+mkfs.ext4 /dev/sdx2 and mount it on /boot 
+mount -t ext4 /dev/sdx2 /boot
+#copy existing boot files in /newboot to /boot
+rsync -a /newboot/ /boot/
+
+get UUID of /dev/sdx2 and append to fstab as below:-
+
+blkid | grep sdx2 
+
+example:-
+append /etc/fstab with content similar to
+
+UUID=1b1d424c-9fd1-4fd2-aba7-80252f1a8d64 /boot ext4 defaults 0       2
+
+grub-install /dev/sdx
+update-grub2
+grub-mkdevicemap
+update-initramfs -u -k all
+
+exit from chroot
+# zfs unmount -a
+# zfs set mountpoint=/ LP_Pool/ROOT/lp_root
+# reboot
+
+https://github.com/openzfs/zfs/wiki/Ubuntu-18.04-Root-on-ZFS
+https://www.rodsbooks.com/gdisk/sgdisk-walkthrough.html
+
+https://pve.proxmox.com/wiki/ZFS:_Tips_and_Tricks
+Boot fails and goes into busybox
+If booting fails with something like
+No pool imported. Manually import the root pool
+at the command prompt and then exit.
+Hint: try: zpool import -R /rpool -N rpool
+is because zfs is invoked too soon (it has happen sometime when connecting a SSD for future ZIL configuration). To prevent it there have been some suggestions in the forum. Try to boot following the suggestions of busybox or searching the forum, and try ONE of the following:
+a) edit /etc/default/grub and add "rootdelay=10" at GRUB_CMDLINE_LINUX_DEFAULT (i.e. GRUB_CMDLINE_LINUX_DEFAULT="rootdelay=10 quiet") and then issue a # update-grub
+b) edit /etc/default/zfs, set ZFS_INITRD_PRE_MOUNTROOT_SLEEP='4', and then issue a "update-initramfs -k 4.2.6-1-pve -u"
